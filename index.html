@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>INTEN20</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papel:#EEF1F4; --tinta:#1B2230; --suave:#5B6474;
+  --cobalto:#2F4BFF; --disco:#FFC93C; --hecho:#1E9E6A; --linea:#D5DAE1; --tarjeta:#FFFFFF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--papel:#141821;--tinta:#EEF1F4;--suave:#9AA3B2;--linea:#2A3140;--tarjeta:#1C2230;--cobalto:#8A9BFF}
+}
+:root[data-theme="dark"]{--papel:#141821;--tinta:#EEF1F4;--suave:#9AA3B2;--linea:#2A3140;--tarjeta:#1C2230;--cobalto:#8A9BFF}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--papel);color:var(--tinta);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.5}
+.envoltura{max-width:640px;margin:0 auto;padding:24px 18px 64px}
+
+/* ---------- LOGO: el 20 se lee como "SO" ---------- */
+.logo{font-stretch:62%;font-weight:900;font-size:clamp(4rem,22vw,7rem);line-height:.85;margin:0;letter-spacing:-.01em}
+.logo .so{display:inline-block;background:var(--disco);color:#1B2230;padding:0 .08em;margin-left:.04em;
+  border-radius:.08em;transform:skewX(-8deg)}
+header p{margin:10px 0 0;color:var(--suave)}
+.semana{margin-top:10px;font-weight:700;color:var(--tinta)!important}
+
+.bloque{margin-top:22px}
+.bloque > span{display:block;font-weight:700;margin-bottom:8px}
+.pastillas{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.pastillas button{font:inherit;font-weight:700;border:2px solid var(--tinta);background:transparent;color:var(--tinta);
+  padding:8px 16px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.pastillas button[aria-pressed="true"]{background:var(--tinta);color:var(--papel)}
+.modos button{flex:1;padding:12px 16px}
+.ayuda{color:var(--suave);font-size:.95rem;margin:8px 0 0}
+
+.sesion{margin-top:26px;background:var(--tarjeta);border:1px solid var(--linea);border-radius:18px;padding:18px}
+.sesion h2{font-stretch:75%;font-weight:800;font-size:1.9rem;line-height:1;margin:0 0 12px}
+.sesion ol{list-style:none;margin:0;padding:0}
+
+/* modo 20: vista previa de bloques */
+.bq{border-top:1px solid var(--linea)}
+.bq > button{all:unset;box-sizing:border-box;display:flex;gap:14px;width:100%;padding:12px 0;cursor:pointer;align-items:baseline}
+.bq > button:focus-visible{outline:3px solid var(--cobalto);outline-offset:2px}
+.bq .min{flex:none;font-stretch:62%;font-weight:900;font-size:1.5rem;width:2.4em;color:var(--suave)}
+.bq strong{display:block}
+.bq small{color:var(--suave)}
+.detalle{padding:0 0 14px}
+.ficha{margin-top:12px}
+.ficha h3{margin:0 0 6px;font-size:1.05rem}
+.medio{aspect-ratio:4/3;background:var(--linea);border-radius:12px;overflow:hidden;display:grid;place-items:center}
+.medio video,.medio img,.medio iframe{width:100%;height:100%;object-fit:cover;border:0;display:block}
+.falta{color:inherit;opacity:.7;font-size:.9rem;text-align:center;padding:20px}
+.ficha ul,.consejos{margin:8px 0 0;padding-left:1.1em;color:var(--suave)}
+
+.empezar{margin-top:18px;width:100%;font:inherit;font-stretch:75%;font-weight:900;font-size:1.6rem;
+  padding:18px;border:0;border-radius:16px;background:var(--disco);color:#1B2230;cursor:pointer}
+.empezar:active{transform:scale(.98)}
+
+/* modo autónomo: lista para tachar */
+.progreso{display:flex;align-items:center;gap:12px;color:var(--suave);font-size:.95rem;margin-bottom:8px}
+.barra{flex:1;height:8px;background:var(--linea);border-radius:99px;overflow:hidden}
+.barra i{display:block;height:100%;width:0;background:var(--hecho);transition:width .3s}
+.grupo{border-top:2px solid var(--tinta);margin-top:14px;padding-top:10px}
+.grupo > h3{margin:0;font-stretch:75%;font-weight:800;font-size:1.3rem}
+.grupo > p{margin:0 0 4px;color:var(--suave);font-size:.92rem}
+.item{border-top:1px solid var(--linea);padding:12px 0}
+.item:first-of-type{border-top:0}
+.item h4{margin:0;font-size:1.1rem;line-height:1.25}
+.item .reps{margin:0;color:var(--cobalto);font-weight:700;font-size:.95rem}
+.item.hecho h4{text-decoration:line-through;text-decoration-thickness:2px;color:var(--suave)}
+.item.hecho .reps{color:var(--suave)}
+.series{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.serie{width:42px;height:42px;border-radius:50%;border:3px solid var(--tinta);background:var(--disco);
+  color:#1B2230;font:inherit;font-weight:900;cursor:pointer;transition:transform .12s}
+.serie[aria-pressed="true"]{background:var(--hecho);border-color:var(--hecho);color:#fff}
+.serie:active{transform:scale(.9)}
+.ver{font:inherit;font-size:.9rem;background:none;border:0;color:var(--suave);text-decoration:underline;cursor:pointer;padding:6px 0 0}
+.item .medio{margin-top:10px}
+.completo{display:none;margin-top:16px;padding:14px;border-radius:12px;background:var(--hecho);color:#fff;font-weight:700;text-align:center}
+.completo.visible{display:block}
+.reiniciar{font:inherit;background:none;border:0;color:var(--suave);text-decoration:underline;cursor:pointer;padding:12px 0 0}
+button:focus-visible{outline:3px solid var(--cobalto);outline-offset:3px}
+
+/* ---------- PANTALLA DEL RELOJ ---------- */
+.reloj{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;
+  padding:calc(env(safe-area-inset-top,0px) + 16px) 18px calc(env(safe-area-inset-bottom,0px) + 16px);
+  background:var(--fondoFase,#1B2230);color:var(--tintaFase,#fff);transition:background .25s}
+.reloj.visible{display:flex}
+.reloj[data-fase="trabajo"]{--fondoFase:#FFC93C;--tintaFase:#1B2230}
+.reloj[data-fase="descanso"]{--fondoFase:#2F4BFF;--tintaFase:#fff}
+.reloj[data-fase="cal"]{--fondoFase:#1E9E6A;--tintaFase:#fff}
+.reloj[data-fase="fin"]{--fondoFase:#1B2230;--tintaFase:#fff}
+.rel-arriba{display:flex;justify-content:space-between;font-weight:700;font-variant-numeric:tabular-nums}
+.rel-total{height:6px;border-radius:99px;background:rgba(0,0,0,.18);margin:10px 0 0;overflow:hidden}
+.rel-total i{display:block;height:100%;background:currentColor;width:0}
+.rel-centro{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:12px}
+.rel-fase{font-stretch:62%;font-weight:900;font-size:clamp(2.4rem,11vw,3.6rem);line-height:.95}
+.rel-seg{font-stretch:62%;font-weight:900;font-size:clamp(6rem,34vw,10rem);line-height:.8;font-variant-numeric:tabular-nums}
+.rel-nombre{font-size:1.5rem;font-weight:800;line-height:1.15;margin-top:10px}
+.rel-medio{flex:1;min-height:120px;margin:12px 0;border-radius:14px;overflow:hidden;background:rgba(0,0,0,.14);display:grid;place-items:center}
+.rel-medio video,.rel-medio img,.rel-medio iframe{width:100%;height:100%;object-fit:cover;border:0;display:block}
+.rel-sig{font-weight:700;opacity:.85}
+.rel-botones{display:flex;gap:10px;margin-top:12px}
+.rel-botones button{flex:1;font:inherit;font-weight:800;padding:14px;border-radius:12px;cursor:pointer;
+  border:2px solid currentColor;background:transparent;color:inherit}
+.rel-fin{flex:1;display:grid;place-content:center;text-align:center}
+.rel-fin h2{font-stretch:62%;font-weight:900;font-size:clamp(3.4rem,18vw,6rem);line-height:.9;margin:0}
+.rel-fin p{opacity:.85;font-size:1.1rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="envoltura" id="inicio">
+  <header>
+    <h1 class="logo" aria-label="INTEN20">INTEN<span class="so">20</span></h1>
+    <p>Entrenos de 20 minutos. Tú eliges cómo.</p>
+    <p class="semana" id="semana"></p>
+  </header>
+
+  <div class="bloque">
+    <span>¿Cómo quieres entrenar?</span>
+    <div class="pastillas modos" id="modos"></div>
+    <p class="ayuda" id="ayudaModo"></p>
+  </div>
+
+  <div class="bloque">
+    <span>Tu nivel</span>
+    <div class="pastillas" id="niveles"></div>
+    <p class="ayuda" id="ayudaNivel"></p>
+  </div>
+
+  <div class="bloque">
+    <span>Días que entrenas a la semana</span>
+    <div class="pastillas" id="frecuencia"></div>
+  </div>
+
+  <div class="bloque" id="bloqueDias">
+    <span>¿Qué toca hoy?</span>
+    <div class="pastillas" id="dias"></div>
+  </div>
+
+  <section class="sesion">
+    <h2 id="tituloSesion"></h2>
+    <div id="contenido"></div>
+  </section>
+</div>
+
+<div class="reloj" id="reloj" role="dialog" aria-label="Entreno en marcha">
+  <div id="relVivo">
+    <div class="rel-arriba"><span id="relBloque"></span><span id="relQuedan"></span></div>
+    <div class="rel-total"><i id="relBarra"></i></div>
+    <div class="rel-centro"><div class="rel-fase" id="relFase"></div><div class="rel-seg" id="relSeg" aria-live="off"></div></div>
+    <div class="rel-nombre" id="relNombre"></div>
+  </div>
+  <div class="rel-medio" id="relMedio"></div>
+  <div class="rel-sig" id="relSig"></div>
+  <div class="rel-fin" id="relFin" hidden>
+    <h2>¡Hecho!</h2>
+    <p id="relFinTexto"></p>
+  </div>
+  <div class="rel-botones">
+    <button id="btnPausa">Pausa</button>
+    <button id="btnSalir">Salir</button>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   1) EJERCICIOS — la biblioteca. Se escribe una vez.
+   media: "media/archivo.mp4", un .gif o un enlace de YouTube.
+   reps: lo que se hace en el modo Autónomo.
+   ============================================================= */
+const EJERCICIOS = {
+  // calentamiento
+  marcha:          { nombre:"Marcha con rodillas altas", reps:"30 pasos", media:"media/marcha.mp4", consejos:["Brazos acompañando","Ritmo suave, que suba el pulso"] },
+  circulos:        { nombre:"Círculos de brazos", reps:"10 adelante + 10 atrás", media:"media/circulos.mp4", consejos:["Cada vez más amplios"] },
+  sentadillaLibre: { nombre:"Sentadilla sin peso", reps:"10", media:"media/sentadilla-libre.mp4", consejos:["Baja solo hasta donde estés cómodo"] },
+  zancadaAtras:    { nombre:"Zancada atrás alterna", reps:"6 por pierna", media:"media/zancada-atras.mp4", consejos:["Paso atrás, tronco recto"] },
+  // trabajo
+  sentadilla:  { nombre:"Sentadilla goblet", reps:"12", media:"media/sentadilla-goblet.mp4", consejos:["Mancuerna pegada al pecho","Baja como si te sentaras en una silla"] },
+  flexiones:   { nombre:"Flexiones", reps:"8–10", media:"media/flexiones.mp4", consejos:["Si cuesta, manos en un banco o rodillas al suelo","Cuerpo en bloque"] },
+  pesoMuerto:  { nombre:"Peso muerto rumano", reps:"12", media:"media/peso-muerto-rumano.mp4", consejos:["Cadera hacia atrás, espalda recta","Mancuernas rozando las piernas"] },
+  remo:        { nombre:"Remo inclinado con mancuernas", reps:"12", media:"media/remo.mp4", consejos:["Tronco inclinado y espalda recta","Codos hacia la cadera"] },
+  zancada:     { nombre:"Zancada alterna", reps:"8 por pierna", media:"media/zancada.mp4", consejos:["Paso largo, tronco erguido"] },
+  pressHombro: { nombre:"Press de hombro", reps:"10", media:"media/press-hombro.mp4", consejos:["Abdomen apretado, sin arquear","Sube sin chocar las mancuernas"] },
+  puente:      { nombre:"Puente de glúteo", reps:"15", media:"media/puente-gluteo.mp4", consejos:["Empuja con los talones","Aprieta arriba 1 segundo"] },
+  plancha:     { nombre:"Plancha", reps:"30 s", media:"media/plancha.mp4", consejos:["Cuerpo en línea recta","Si cuesta, rodillas al suelo"] },
+  deadBug:     { nombre:"Dead bug", reps:"8 por lado", media:"media/dead-bug.mp4", consejos:["Lumbar pegada al suelo","Lento y respirando"] },
+  escaladores: { nombre:"Escaladores", reps:"20 toques", media:"media/escaladores.mp4", consejos:["Manos bajo los hombros","Si cuesta, hazlo andando"] }
+};
+
+/* =============================================================
+   2) EL SISTEMA — 5 bloques
+   Bloque 1: calentamiento. Bloques 2–5: dos ejercicios alternos.
+   Modo 20: cada bloque dura 4 min, con el ritmo del nivel.
+   Autónomo: cada bloque son X rondas (según nivel) con repeticiones.
+   ============================================================= */
+const CALENTAMIENTO = ["marcha","circulos","sentadillaLibre","zancadaAtras"];
+
+const NIVELES = {
+  1: { nombre:"Nivel 1", trabajo:30, descanso:30, rondas:2 },
+  2: { nombre:"Nivel 2", trabajo:40, descanso:20, rondas:3 },
+  3: { nombre:"Nivel 3", trabajo:20, descanso:10, rondas:4 }   // en Modo 20 es un Tabata
+};
+
+/* EL WOD — lo que cambias tú. Cada bloque: [ejercicio A, ejercicio B] */
+const SESIONES = {
+  A: { nombre:"Sesión A", bloques:[["sentadilla","flexiones"],["pesoMuerto","remo"],["zancada","pressHombro"],["plancha","deadBug"]] },
+  B: { nombre:"Sesión B", bloques:[["pesoMuerto","pressHombro"],["sentadilla","remo"],["puente","flexiones"],["escaladores","deadBug"]] },
+  C: { nombre:"Sesión C", bloques:[["zancada","remo"],["puente","pressHombro"],["sentadilla","flexiones"],["escaladores","plancha"]] }
+};
+/* Qué sesiones hace quien va 1, 2 o 3 días */
+const PLANES = { 1:["A"], 2:["A","B"], 3:["A","B","C"] };
+
+/* =============================================================
+   3) LÓGICA — no hace falta tocarla
+   ============================================================= */
+const BLOQUE_SEG = 240, TOTAL = 20*60;
+const $ = id => document.getElementById(id);
+function leer(k, def){ try { const v = localStorage.getItem(k); return v === null ? def : JSON.parse(v); } catch { return def; } }
+function guardar(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function borrar(k){ try { localStorage.removeItem(k); } catch {} }
+function fecha(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function mmss(s){ s = Math.max(0, Math.ceil(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+
+let modo  = leer("i20:modo", "reloj"); if (!["reloj","autonomo"].includes(modo)) modo = "reloj";
+let nivel = leer("i20:nivel", 1); if (!NIVELES[nivel]) nivel = 1;
+let freq  = leer("i20:frecuencia", 2); if (!PLANES[freq]) freq = 2;
+let dia   = leer("i20:dia", 0);
+const abiertos = new Set();
+
+function medio(src, nombre){
+  const falta = `<div class="falta">Vídeo de ${nombre} pendiente</div>`;
+  if (!src) return falta;
+  const yt = src.match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/);
+  if (yt) return `<iframe src="https://www.youtube-nocookie.com/embed/${yt[1]}?autoplay=1&mute=1&loop=1&playlist=${yt[1]}&playsinline=1&controls=0" title="${nombre}" allow="autoplay"></iframe>`;
+  const err = `onerror="this.outerHTML='<div class=falta>Vídeo de ${nombre} pendiente</div>'"`;
+  if (/\.(mp4|webm|mov)$/i.test(src)) return `<video src="${src}" autoplay loop muted playsinline aria-label="${nombre}" ${err}></video>`;
+  return `<img src="${src}" alt="${nombre}" ${err}>`;
+}
+
+function claveSesion(){ const l = PLANES[freq]; if (dia >= l.length) dia = 0; return l[dia]; }
+function sesionActual(){ return SESIONES[claveSesion()]; }
+
+/* ---------- historial semanal ---------- */
+function apuntarEntreno(){
+  const h = leer("i20:historial", []);
+  h.push({ f:fecha(new Date()), s:claveSesion(), m:modo });
+  guardar("i20:historial", h.slice(-300));
+}
+function entrenosSemana(){
+  const d = new Date(); const lunes = fecha(new Date(d.getFullYear(), d.getMonth(), d.getDate() - (d.getDay()+6)%7));
+  return leer("i20:historial", []).filter(x => (x.f || x) >= lunes).length;
+}
+
+/* ---------- pantalla de inicio ---------- */
+function pintarInicio(){
+  $("modos").innerHTML =
+    `<button data-modo="reloj" aria-pressed="${modo==="reloj"}">Modo 20</button>` +
+    `<button data-modo="autonomo" aria-pressed="${modo==="autonomo"}">Autónomo</button>`;
+  $("ayudaModo").textContent = modo === "reloj"
+    ? "El reloj manda: sigue el vídeo y no pares. Todo va solo."
+    : "A tu ritmo: haz las repeticiones y ve tachando cada serie.";
+
+  $("niveles").innerHTML = Object.entries(NIVELES).map(([k,n]) =>
+    `<button data-nivel="${k}" aria-pressed="${+k===nivel}">${n.nombre}</button>`).join("");
+  const n = NIVELES[nivel];
+  $("ayudaNivel").textContent = modo === "reloj"
+    ? `${n.trabajo} s de trabajo, ${n.descanso} s de descanso${nivel===3 ? " (Tabata)" : ""}.`
+    : `${n.rondas} rondas por bloque.`;
+
+  $("frecuencia").innerHTML = [1,2,3].map(x =>
+    `<button data-freq="${x}" aria-pressed="${x===freq}">${x} ${x===1?"día":"días"}</button>`).join("");
+
+  const lista = PLANES[freq];
+  const ses = sesionActual();
+  $("bloqueDias").style.display = lista.length > 1 ? "" : "none";
+  $("dias").innerHTML = lista.map((k,i) =>
+    `<button data-dia="${i}" aria-pressed="${i===dia}">${SESIONES[k].nombre}</button>`).join("");
+
+  const hechos = entrenosSemana();
+  $("semana").textContent = `Esta semana: ${hechos} de ${freq} ${freq===1?"entreno":"entrenos"}` + (hechos >= freq ? ". ¡Cumplido!" : "");
+  $("tituloSesion").textContent = ses.nombre;
+
+  modo === "reloj" ? pintarModo20(ses) : pintarAutonomo(ses);
+}
+
+function fichas(ids){
+  return ids.map(id => `<div class="ficha"><h3>${EJERCICIOS[id].nombre}</h3>
+    <div class="medio">${medio(EJERCICIOS[id].media, EJERCICIOS[id].nombre)}</div>
+    <ul>${EJERCICIOS[id].consejos.map(c=>`<li>${c}</li>`).join("")}</ul></div>`).join("");
+}
+
+function pintarModo20(ses){
+  const n = NIVELES[nivel];
+  const filas = [{ titulo:"Calentamiento", ids:CALENTAMIENTO, sub:"1 min cada ejercicio, seguidos" }]
+    .concat(ses.bloques.map((par,i) => ({ titulo:`Bloque ${i+2}`, ids:par, sub:`Alterna ${n.trabajo}/${n.descanso} durante 4 min` })));
+  $("contenido").innerHTML = `<ol>${filas.map((f,i) => {
+    const k = "bq:"+i, abierto = abiertos.has(k);
+    return `<li class="bq"><button data-abrir="${k}" aria-expanded="${abierto}">
+        <span class="min">${i*4}'</span>
+        <span><strong>${f.ids.map(id => EJERCICIOS[id].nombre).join(" + ")}</strong><small>${f.titulo}. ${f.sub}</small></span>
+      </button>${abierto ? `<div class="detalle">${fichas(f.ids)}</div>` : ""}</li>`;
+  }).join("")}</ol>
+  <button class="empezar" id="empezar">Empezar 20:00</button>`;
+}
+
+/* ---------- modo autónomo ---------- */
+const claveMarcas = () => `i20:marcas:${fecha(new Date())}:${claveSesion()}:${nivel}`;
+
+function gruposAutonomo(ses){
+  const r = NIVELES[nivel].rondas;
+  return [{ titulo:"Calentamiento", sub:"Una vuelta seguida, sin descanso.", items:CALENTAMIENTO.map(id => ({id, series:1})) }]
+    .concat(ses.bloques.map((par,i) => ({ titulo:`Bloque ${i+2}`,
+      sub:`Alterna los dos ejercicios: ${r} rondas. Descansa lo justo entre rondas.`,
+      items:par.map(id => ({id, series:r})) })));
+}
+
+function pintarAutonomo(ses){
+  const marcas = leer(claveMarcas(), {});
+  let total = 0, hechas = 0;
+  const html = gruposAutonomo(ses).map((g, gi) => `<div class="grupo"><h3>${g.titulo}</h3><p>${g.sub}</p>
+    ${g.items.map((it, ii) => {
+      const ej = EJERCICIOS[it.id], k = `${gi}-${ii}`, m = marcas[k] || [];
+      const n = m.filter(Boolean).length; total += it.series; hechas += n;
+      const abierto = abiertos.has("ej:"+k);
+      return `<div class="item${n === it.series ? " hecho" : ""}">
+        <h4>${ej.nombre}</h4><p class="reps">${ej.reps}${it.series > 1 ? ` · ${it.series} series` : ""}</p>
+        <div class="series">${Array.from({length:it.series}, (_,s) =>
+          `<button class="serie" data-marca="${k}" data-s="${s}" aria-pressed="${!!m[s]}" aria-label="Serie ${s+1} de ${ej.nombre}">${m[s] ? "✓" : s+1}</button>`).join("")}</div>
+        <button class="ver" data-abrir="ej:${k}" aria-expanded="${abierto}">${abierto ? "Ocultar vídeo" : "Ver vídeo y consejos"}</button>
+        ${abierto ? `<div class="medio">${medio(ej.media, ej.nombre)}</div><ul class="consejos">${ej.consejos.map(c=>`<li>${c}</li>`).join("")}</ul>` : ""}
+      </div>`;
+    }).join("")}</div>`).join("");
+
+  $("contenido").innerHTML =
+    `<div class="progreso"><div class="barra"><i style="width:${total ? hechas/total*100 : 0}%"></i></div><span>${hechas} de ${total}</span></div>
+     ${html}
+     <div class="completo${hechas === total ? " visible" : ""}">¡Sesión completada! Así se entrena.</div>
+     <button class="reiniciar" id="reiniciar">Desmarcar todo</button>`;
+  return { total, hechas };
+}
+
+function marcar(k, s){
+  const clave = claveMarcas(), marcas = leer(clave, {});
+  marcas[k] = marcas[k] || []; marcas[k][s] = !marcas[k][s];
+  guardar(clave, marcas);
+  const antes = leer(clave + ":apuntado", false);
+  pintarInicio();
+  const { total, hechas } = contar(marcas);
+  if (hechas === total && !antes){ guardar(clave + ":apuntado", true); apuntarEntreno(); pintarInicio(); }
+}
+function contar(marcas){
+  let total = 0, hechas = 0;
+  gruposAutonomo(sesionActual()).forEach((g, gi) => g.items.forEach((it, ii) => {
+    total += it.series; hechas += (marcas[`${gi}-${ii}`] || []).filter(Boolean).length;
+  }));
+  return { total, hechas };
+}
+
+/* ---------- Modo 20: construir los 20 minutos ---------- */
+function construir(){
+  const ses = sesionActual(), n = NIVELES[nivel], segs = [];
+  CALENTAMIENTO.forEach(id => segs.push({ fase:"cal", id, dur:60, bloque:1 }));
+  ses.bloques.forEach((par, b) => {
+    const rondas = Math.floor(BLOQUE_SEG / (n.trabajo + n.descanso));
+    for (let r = 0; r < rondas; r++){
+      segs.push({ fase:"trabajo",  id:par[r%2], dur:n.trabajo,  bloque:b+2 });
+      segs.push({ fase:"descanso", id:null,     dur:n.descanso, bloque:b+2 });
+    }
+  });
+  segs.forEach((s,i) => { const sig = segs.slice(i+1).find(x => x.id); s.sig = sig ? sig.id : null; });
+  return segs;
+}
+
+let audio = null, candado = null;
+function pitido(f=880, d=.12){
+  if (!audio) return;
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.frequency.value = f; g.gain.value = .25; o.connect(g); g.connect(audio.destination);
+  o.start(); o.stop(audio.currentTime + d);
+}
+async function mantenerPantalla(){ try { candado = await navigator.wakeLock?.request("screen"); } catch {} }
+function soltarPantalla(){ try { candado?.release(); } catch {} candado = null; }
+
+let segs = [], idx = 0, finSeg = 0, pausado = false, restoPausa = 0, bucle = null, ultimoPitido = -1;
+
+function empezar(){
+  try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); } catch {}
+  segs = construir(); idx = 0; pausado = false;
+  finSeg = Date.now() + segs[0].dur*1000;
+  $("reloj").classList.add("visible"); $("relFin").hidden = true;
+  ["relVivo","relMedio","relSig"].forEach(i => $(i).hidden = false);
+  $("btnPausa").hidden = false; $("btnPausa").textContent = "Pausa"; $("btnSalir").textContent = "Salir";
+  mantenerPantalla(); pintarSegmento(); pitido(1200,.3);
+  bucle = setInterval(tic, 200); tic();
+}
+
+function pintarSegmento(){
+  const s = segs[idx];
+  $("reloj").dataset.fase = s.fase;
+  $("relBloque").textContent = `Bloque ${s.bloque} de 5`;
+  const mostrar = s.id || s.sig;
+  if (s.fase === "trabajo"){ $("relFase").textContent = "¡Dale!"; $("relNombre").textContent = EJERCICIOS[s.id].nombre; }
+  if (s.fase === "cal"){ $("relFase").textContent = "Calienta"; $("relNombre").textContent = EJERCICIOS[s.id].nombre; }
+  if (s.fase === "descanso"){ $("relFase").textContent = "Respira"; $("relNombre").textContent = s.sig ? `Prepárate: ${EJERCICIOS[s.sig].nombre}` : "Último descanso"; }
+  $("relMedio").innerHTML = mostrar ? medio(EJERCICIOS[mostrar].media, EJERCICIOS[mostrar].nombre) : "";
+  $("relSig").textContent = (s.id && s.sig) ? `Luego: ${EJERCICIOS[s.sig].nombre}` : "";
+  ultimoPitido = -1;
+}
+
+function tic(){
+  if (pausado) return;
+  let resta = (finSeg - Date.now())/1000;
+  while (resta <= 0){
+    idx++;
+    if (idx >= segs.length){ terminar(); return; }
+    finSeg += segs[idx].dur*1000; resta = (finSeg - Date.now())/1000;
+    pintarSegmento();
+    pitido(segs[idx].fase === "descanso" ? 600 : 1200, .3);
+    try { navigator.vibrate?.(segs[idx].fase === "descanso" ? 150 : [120,60,120]); } catch {}
+  }
+  const seg = Math.ceil(resta);
+  $("relSeg").textContent = seg;
+  if (seg <= 3 && seg >= 1 && seg !== ultimoPitido){ ultimoPitido = seg; pitido(880,.1); }
+  const quedan = segs.slice(idx+1).reduce((a,s) => a + s.dur, 0) + resta;
+  $("relQuedan").textContent = `Quedan ${mmss(quedan)}`;
+  $("relBarra").style.width = ((TOTAL - quedan) / TOTAL * 100) + "%";
+}
+
+function terminar(){
+  clearInterval(bucle); soltarPantalla(); apuntarEntreno();
+  $("reloj").dataset.fase = "fin";
+  ["relVivo","relMedio","relSig"].forEach(i => $(i).hidden = true);
+  $("relFin").hidden = false;
+  const n = entrenosSemana();
+  $("relFinTexto").textContent = `${sesionActual().nombre} completada. Llevas ${n} ${n===1?"entreno":"entrenos"} esta semana.`;
+  $("btnPausa").hidden = true; $("btnSalir").textContent = "Volver";
+  pitido(1200,.2); setTimeout(() => pitido(1500,.4), 250);
+  pintarInicio();
+}
+function salir(){ clearInterval(bucle); soltarPantalla(); $("reloj").classList.remove("visible"); $("relMedio").innerHTML = ""; }
+
+$("btnPausa").addEventListener("click", () => {
+  if (!pausado){ pausado = true; restoPausa = finSeg - Date.now(); $("btnPausa").textContent = "Seguir"; $("relFase").textContent = "En pausa"; }
+  else { pausado = false; finSeg = Date.now() + restoPausa; $("btnPausa").textContent = "Pausa"; pintarSegmento(); }
+});
+$("btnSalir").addEventListener("click", () => {
+  if ($("relFin").hidden && !confirm("¿Seguro que quieres dejar el entreno?")) return;
+  salir();
+});
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && $("reloj").classList.contains("visible") && $("relFin").hidden) mantenerPantalla();
+});
+
+/* ---------- clics en la pantalla de inicio ---------- */
+$("inicio").addEventListener("click", e => {
+  const t = e.target;
+  const md = t.closest("[data-modo]"); if (md){ modo = md.dataset.modo; guardar("i20:modo", modo); abiertos.clear(); pintarInicio(); return; }
+  const nv = t.closest("[data-nivel]"); if (nv){ nivel = +nv.dataset.nivel; guardar("i20:nivel", nivel); pintarInicio(); return; }
+  const f = t.closest("[data-freq]"); if (f){ freq = +f.dataset.freq; dia = 0; guardar("i20:frecuencia", freq); guardar("i20:dia", 0); abiertos.clear(); pintarInicio(); return; }
+  const d = t.closest("[data-dia]"); if (d){ dia = +d.dataset.dia; guardar("i20:dia", dia); abiertos.clear(); pintarInicio(); return; }
+  const a = t.closest("[data-abrir]"); if (a){ const k = a.dataset.abrir; abiertos.has(k) ? abiertos.delete(k) : abiertos.add(k); pintarInicio(); return; }
+  const m = t.closest("[data-marca]"); if (m){ marcar(m.dataset.marca, +m.dataset.s); return; }
+  if (t.closest("#empezar")){ empezar(); return; }
+  if (t.closest("#reiniciar")){ borrar(claveMarcas()); pintarInicio(); }
+});
+pintarInicio();
+</script>
+</body>
+</html>
